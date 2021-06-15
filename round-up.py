@@ -14,9 +14,18 @@ class roundUp:
         self.accountUid = None
         self.defaultCategory = None
 
-    # * api-sandbox GET Request
     
     def getreq(self, request_params):
+
+        """api-sandbox GET request
+
+        Args:
+            request_params (string): url parameters inc. queries
+
+        Returns:
+            json-content of response: sandbox 
+        """
+        
         return requests.get(
             'https://api-sandbox.starlingbank.com' + request_params,
             headers={
@@ -26,12 +35,17 @@ class roundUp:
             }
         ).json()
     
-    # * SET sanbox customer credentials
     
     def setcreds(self, r):
+        
+        """SET sandbox customer credentials
+
+        Args:
+            r (json dict): GET response from sandbox
+        """
+        
         self.accountUid = r['accounts'][0]['accountUid']
         self.defaultCategory = r['accounts'][0]['defaultCategory']
-        print(r)
         
 main = roundUp(None)
 accounts = main.getreq('/api/v2/accounts')
