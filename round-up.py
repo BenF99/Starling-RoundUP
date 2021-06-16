@@ -17,6 +17,7 @@ class roundUp:
             }
         acc = self.getreq('/accounts')
         self.accountUid = acc['accounts'][0]['accountUid']
+        print(self.accountUid)
         self.defaultCategory = acc['accounts'][0]['defaultCategory']
 
         sav = self.getreq(f'/account/{self.accountUid}/savings-goals')
@@ -37,27 +38,40 @@ class roundUp:
             headers= self._headers
         ).json()
 
+        if 'error' in r:
+            raise Exception(r['error_description'])
         return r
 
     def calcSavings(self, min_dt, max_dt):
+        """Round up to calculate savings
+
+        Args:
+            min_dt (String): minTransactionTimestamp
+            max_dt (String): maxTransactionTimestamp
+
+        Returns:
+            int: minorUnits of savings
+        """
         feed = f"/feed/account/{main.accountUid}/category/{main.defaultCategory}/transactions-between?minTransactionTimestamp={min_dt}&maxTransactionTimestamp={max_dt}"
         resp = main.getreq(feed)['feedItems']
         tot = 0
         for i in range(len(resp)):
             x = resp[i]['amount']['minorUnits'] / 100
             tot += math.ceil(x) - x
-        return round(tot, 2)
+        # print(tot)
+        minor_units = int(round(tot, 2) * 100)
+        return minor_units
 
     def addToSavings(self, _savings):
         """Add "round_up" to savings
 
         Args:
-            _savings ([type]): [description]
+            _savings (float): .calcSavings
         """
         payload = {
             "amount": {
                 "currency": "GBP",
-                "minorUnits": int(_savings * 100)
+                "minorUnits": _savings
             }
         }
         sav_params = f"/account/{main.accountUid}/savings-goals/{self.savingsGoalUid}/add-money/{str(uuid.uuid4())}"
@@ -66,7 +80,6 @@ class roundUp:
             headers=self._headers,
             data=jd(payload)
         )
-
         print(r.content)
 
 
