@@ -1,16 +1,21 @@
 import requests
 import os
+import math
+import uuid
 
 
 class roundUp:
 
-    # TODO - Maybe put some things in the constructor?
-    def __init__(self, weekStart):
-        self.weekStart = weekStart
+    def __init__(self):
         self.accessToken = os.environ.get(
-            'SANDBOX_ACCESS_TOKEN')  # * environment variable
-        self.accountUid = None
-        self.defaultCategory = None
+            'SANDBOX_ACCESS_TOKEN')  # ! Set TOKEN in os env
+
+        acc = self.getreq('/api/v2/accounts')
+        self.accountUid = acc['accounts'][0]['accountUid']
+        self.defaultCategory = acc['accounts'][0]['defaultCategory']
+
+        sav = self.getreq(f'/api/v2/account/{self.accountUid}/savings-goals')
+        self.savingsGoalUid = sav['savingsGoalList'][0]['savingsGoalUid']
 
     def getreq(self, request_params):
         """api-sandbox GET request
@@ -22,7 +27,7 @@ class roundUp:
             json-content of response: sandbox 
         """
 
-        return requests.get(
+        r = requests.get(
             'https://api-sandbox.starlingbank.com' + request_params,
             headers={
                 "Accept": "application/json",
@@ -31,24 +36,41 @@ class roundUp:
             }
         ).json()
 
-    def setcreds(self, r):
-        """SET sandbox customer credentials
+        return r
 
-        Args:
-            r (json dict): GET response from sandbox
-        """
+    def calcSavings(self, min_dt, max_dt):
+        feed = f"/api/v2/feed/account/{main.accountUid}/category/{main.defaultCategory}/transactions-between?minTransactionTimestamp={min_dt}&maxTransactionTimestamp={max_dt}"
+        resp = main.getreq(feed)['feedItems']
+        tot = 0
+        for i in range(len(resp)):
+            x = resp[i]['amount']['minorUnits'] / 100
+            tot += math.ceil(x) - x
+        return round(tot, 2)
 
-        self.accountUid = r['accounts'][0]['accountUid']
-        self.defaultCategory = r['accounts'][0]['defaultCategory']
+    def addToSavings(self, _savings):
+        payload = {
+            "amount": {
+                "currency": "GBP",
+                "minorUnits": _savings * 100
+            }
+        }
+        sav_url = f"/api/v2/account/{main.accountUid}/savings-goals/{self.savingsGoalUid}/add-money/{str(uuid.uuid4())}"
+        r = requests.put(
+            'https://api-sandbox.starlingbank.com' + sav_url,
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.accessToken}"
+            },
+            data=payload
+        )
 
+        print(r.content)
 
-main = roundUp(None)
-accounts = main.getreq('/api/v2/accounts')
-main.setcreds(accounts)
 
 minTransactionTimestamp = "2021-06-01T12%3A34%3A56.000Z"
 maxTransactionTimestamp = "2021-07-01T12%3A34%3A56.000Z"
 
-feed = f"/api/v2/feed/account/{main.accountUid}/category/{main.defaultCategory}/transactions-between?minTransactionTimestamp={minTransactionTimestamp}&maxTransactionTimestamp={maxTransactionTimestamp}"
-
-print(main.getreq(feed))
+main = roundUp()
+savings = main.calcSavings(minTransactionTimestamp, maxTransactionTimestamp)
+main.addToSavings(savings)
