@@ -5,16 +5,18 @@ import uuid
 from json import dumps as jd
 
 SANDBOX_URL = "https://api-sandbox.starlingbank.com/api/v2"
+
+
 class roundUp:
 
     def __init__(self):
         self.accessToken = os.environ.get(
             'SANDBOX_ACCESS_TOKEN')  # ! Set TOKEN in os env
         self._headers = {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.accessToken}"
-            }
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.accessToken}"
+        }
         acc = self.getreq('/accounts')
         self.accountUid = acc['accounts'][0]['accountUid']
         print(self.accountUid)
@@ -35,7 +37,7 @@ class roundUp:
 
         r = requests.get(
             SANDBOX_URL + request_params,
-            headers= self._headers
+            headers=self._headers
         ).json()
 
         if 'error' in r:
