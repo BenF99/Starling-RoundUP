@@ -19,7 +19,6 @@ class roundUp:
         }
         acc = self.getreq('/accounts')
         self.accountUid = acc['accounts'][0]['accountUid']
-        print(self.accountUid)
         self.defaultCategory = acc['accounts'][0]['defaultCategory']
 
         sav = self.getreq(f'/account/{self.accountUid}/savings-goals')
