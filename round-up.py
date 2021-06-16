@@ -2,19 +2,24 @@ import requests
 import os
 import math
 import uuid
+from json import dumps as jd
 
-
+SANDBOX_URL = "https://api-sandbox.starlingbank.com/api/v2"
 class roundUp:
 
     def __init__(self):
         self.accessToken = os.environ.get(
             'SANDBOX_ACCESS_TOKEN')  # ! Set TOKEN in os env
-
-        acc = self.getreq('/api/v2/accounts')
+        self._headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.accessToken}"
+            }
+        acc = self.getreq('/accounts')
         self.accountUid = acc['accounts'][0]['accountUid']
         self.defaultCategory = acc['accounts'][0]['defaultCategory']
 
-        sav = self.getreq(f'/api/v2/account/{self.accountUid}/savings-goals')
+        sav = self.getreq(f'/account/{self.accountUid}/savings-goals')
         self.savingsGoalUid = sav['savingsGoalList'][0]['savingsGoalUid']
 
     def getreq(self, request_params):
@@ -28,18 +33,14 @@ class roundUp:
         """
 
         r = requests.get(
-            'https://api-sandbox.starlingbank.com' + request_params,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.accessToken}"
-            }
+            SANDBOX_URL + request_params,
+            headers= self._headers
         ).json()
 
         return r
 
     def calcSavings(self, min_dt, max_dt):
-        feed = f"/api/v2/feed/account/{main.accountUid}/category/{main.defaultCategory}/transactions-between?minTransactionTimestamp={min_dt}&maxTransactionTimestamp={max_dt}"
+        feed = f"/feed/account/{main.accountUid}/category/{main.defaultCategory}/transactions-between?minTransactionTimestamp={min_dt}&maxTransactionTimestamp={max_dt}"
         resp = main.getreq(feed)['feedItems']
         tot = 0
         for i in range(len(resp)):
@@ -48,21 +49,22 @@ class roundUp:
         return round(tot, 2)
 
     def addToSavings(self, _savings):
+        """Add "round_up" to savings
+
+        Args:
+            _savings ([type]): [description]
+        """
         payload = {
             "amount": {
                 "currency": "GBP",
-                "minorUnits": _savings * 100
+                "minorUnits": int(_savings * 100)
             }
         }
-        sav_url = f"/api/v2/account/{main.accountUid}/savings-goals/{self.savingsGoalUid}/add-money/{str(uuid.uuid4())}"
+        sav_params = f"/account/{main.accountUid}/savings-goals/{self.savingsGoalUid}/add-money/{str(uuid.uuid4())}"
         r = requests.put(
-            'https://api-sandbox.starlingbank.com' + sav_url,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.accessToken}"
-            },
-            data=payload
+            SANDBOX_URL + sav_params,
+            headers=self._headers,
+            data=jd(payload)
         )
 
         print(r.content)
