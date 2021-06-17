@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -11,7 +12,7 @@
     <title></title>
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="{% static '/styles.css' %}" />
     <link
       href="https://fonts.googleapis.com/css2?family=Alata&display=swap"
       rel="stylesheet"
@@ -24,7 +25,10 @@
 
   <body>
     <div id="particles-js"></div>
-    <div id="page"></div>
+    <div id="page">
+      <h1>Round Up: Savings</h1>
+      <p>An application that takes the "round-up" for a given week and transfers the amount to a savings goal/pot</p>
+    </div>
     <!--[if lt IE 7]>
       <p class="browsehappy">
         You are using an <strong>outdated</strong> browser. Please
@@ -34,7 +38,7 @@
 
     <script src="" async defer></script>
 
-    <script src="particles.js"></script>
-    <script src="app.js"></script>
+    <script src="{% static '/particles.js' %}"></script>
+    <script src="{% static '/app.js' %}"></script>
   </body>
 </html>
