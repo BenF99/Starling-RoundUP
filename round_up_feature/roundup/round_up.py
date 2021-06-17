@@ -20,6 +20,8 @@ class roundUp:
         acc = self.getreq('/accounts')
         self.accountUid = acc['accounts'][0]['accountUid']
         self.defaultCategory = acc['accounts'][0]['defaultCategory']
+        print(self.accountUid)
+        print(self.defaultCategory)
 
         sav = self.getreq(f'/account/{self.accountUid}/savings-goals')
         self.savingsGoalUid = sav['savingsGoalList'][0]['savingsGoalUid']
@@ -55,6 +57,8 @@ class roundUp:
         """
         feed = f"/feed/account/{self.accountUid}/category/{self.defaultCategory}/transactions-between?minTransactionTimestamp={min_dt}&maxTransactionTimestamp={max_dt}"
         resp = self.getreq(feed)['feedItems']
+        if not resp:
+            print("HELLO")
         tot = 0
         for i in range(len(resp)):
             x = resp[i]['amount']['minorUnits'] / 100
@@ -84,11 +88,11 @@ class roundUp:
         print(r.content)
 
 
-def main():
-    
-    minTransactionTimestamp = "2021-06-01T12%3A34%3A56.000Z"
-    maxTransactionTimestamp = "2021-07-01T12%3A34%3A56.000Z"
+def main(minTransactionTimestamp, maxTransactionTimestamp):
+    # 2021-06-21 00:00:00
 
     main = roundUp()
     savings = main.calcSavings(minTransactionTimestamp, maxTransactionTimestamp)
     main.addToSavings(savings)
+
+main("2021-05-31T00:00:00.000Z","2021-06-07T00:00:00.000Z")
