@@ -86,11 +86,16 @@ class roundUp:
             headers=self._headers,
             data=jd(payload)
         )
-        print(r.content)
+        print(r.content) # * Testing.
 
 
 def main(minTransactionTimestamp, maxTransactionTimestamp):
-    # 2021-06-21 00:00:00
+    """main function to execute round up savings
+
+    Args:
+        minTransactionTimestamp (str): the min timestamp
+        maxTransactionTimestamp (str): the max timestamp (1 week)
+    """
 
     main = roundUp()
     savings = main.calcSavings(minTransactionTimestamp, maxTransactionTimestamp)
