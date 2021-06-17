@@ -53,8 +53,8 @@ class roundUp:
         Returns:
             int: minorUnits of savings
         """
-        feed = f"/feed/account/{main.accountUid}/category/{main.defaultCategory}/transactions-between?minTransactionTimestamp={min_dt}&maxTransactionTimestamp={max_dt}"
-        resp = main.getreq(feed)['feedItems']
+        feed = f"/feed/account/{self.accountUid}/category/{self.defaultCategory}/transactions-between?minTransactionTimestamp={min_dt}&maxTransactionTimestamp={max_dt}"
+        resp = self.getreq(feed)['feedItems']
         tot = 0
         for i in range(len(resp)):
             x = resp[i]['amount']['minorUnits'] / 100
@@ -75,7 +75,7 @@ class roundUp:
                 "minorUnits": _savings
             }
         }
-        sav_params = f"/account/{main.accountUid}/savings-goals/{self.savingsGoalUid}/add-money/{str(uuid.uuid4())}"
+        sav_params = f"/account/{self.accountUid}/savings-goals/{self.savingsGoalUid}/add-money/{str(uuid.uuid4())}"
         r = requests.put(
             SANDBOX_URL + sav_params,
             headers=self._headers,
@@ -84,9 +84,11 @@ class roundUp:
         print(r.content)
 
 
-minTransactionTimestamp = "2021-06-01T12%3A34%3A56.000Z"
-maxTransactionTimestamp = "2021-07-01T12%3A34%3A56.000Z"
+def main():
+    
+    minTransactionTimestamp = "2021-06-01T12%3A34%3A56.000Z"
+    maxTransactionTimestamp = "2021-07-01T12%3A34%3A56.000Z"
 
-main = roundUp()
-savings = main.calcSavings(minTransactionTimestamp, maxTransactionTimestamp)
-main.addToSavings(savings)
+    main = roundUp()
+    savings = main.calcSavings(minTransactionTimestamp, maxTransactionTimestamp)
+    main.addToSavings(savings)
