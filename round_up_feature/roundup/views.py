@@ -26,6 +26,5 @@ def helper(yyyy_ww):
     
     minTransactionTimestamp = formtimestamp(minTransactionDT)
     maxTransactionTimestamp = formtimestamp(maxTransactionDT)
-    print(maxTransactionTimestamp, minTransactionTimestamp)
     
     return minTransactionTimestamp, maxTransactionTimestamp
