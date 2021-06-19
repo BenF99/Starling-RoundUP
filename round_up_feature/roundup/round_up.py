@@ -71,7 +71,7 @@ class roundUp:
             tot += math.ceil(x) - x
 
         # * Converts round up to minor units with 2DP
-        minor_units = int(round(tot, 2) * 100)
+        minor_units = int(tot * 100)
 
         return minor_units
 
