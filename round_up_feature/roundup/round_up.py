@@ -16,11 +16,15 @@ class roundUp:
             "Accept": "application/json",
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.accessToken}"
-        }
-        acc = self.getreq('/accounts')
+        }  # API Headers
+        acc = self.getreq('/accounts')  # ! ACCOUNTS req
+        # * SANDBOX ACCOUNT UID
         self.accountUid = acc['accounts'][0]['accountUid']
+        # * SANDBOX CATEGORY ID
         self.defaultCategory = acc['accounts'][0]['defaultCategory']
+        # ! SAVINGS req
         sav = self.getreq(f'/account/{self.accountUid}/savings-goals')
+        # * SAVINGS GOAL UID - Requires existing savings goal
         self.savingsGoalUid = sav['savingsGoalList'][0]['savingsGoalUid']
 
     def getreq(self, request_params):
@@ -54,18 +58,21 @@ class roundUp:
         """
         feed = f"/feed/account/{self.accountUid}/category/{self.defaultCategory}/transactions-between?minTransactionTimestamp={min_dt}&maxTransactionTimestamp={max_dt}"
         resp = self.getreq(feed)['feedItems']
-        
+
         if not resp:
             raise Exception("No transactions in specified week")
-        
+
         tot = 0
-        
+
         for i in range(len(resp)):
+            # * Converts minorUnits to standard format
             x = resp[i]['amount']['minorUnits'] / 100
+            # * Rounds up TRANSACTION, subtracts from actual value - summation (tot)
             tot += math.ceil(x) - x
-            
+
+        # * Converts round up to minor units with 2DP
         minor_units = int(round(tot, 2) * 100)
-        
+
         return minor_units
 
     def addToSavings(self, _savings):
@@ -74,19 +81,20 @@ class roundUp:
         Args:
             _savings (float): .calcSavings
         """
-        payload = {
+        savload = {
             "amount": {
                 "currency": "GBP",
                 "minorUnits": _savings
             }
         }
+        # * "uuid.uuid4" -> Generates random uuid
         sav_params = f"/account/{self.accountUid}/savings-goals/{self.savingsGoalUid}/add-money/{str(uuid.uuid4())}"
-        r = requests.put(
+        r = requests.put(  # PUT request for savload
             SANDBOX_URL + sav_params,
             headers=self._headers,
-            data=jd(payload)
+            data=jd(savload)
         )
-        print(r.content) # * Testing.
+        print(r.content)  # * Testing.
 
 
 def main(minTransactionTimestamp, maxTransactionTimestamp):
@@ -98,5 +106,8 @@ def main(minTransactionTimestamp, maxTransactionTimestamp):
     """
 
     main = roundUp()
-    savings = main.calcSavings(minTransactionTimestamp, maxTransactionTimestamp)
+    savings = main.calcSavings(
+        minTransactionTimestamp, maxTransactionTimestamp)
     main.addToSavings(savings)
+
+    return savings/100  # Return savings in standard format to be displayed on HTML page
