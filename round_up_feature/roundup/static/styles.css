@@ -21,22 +21,30 @@ h1 {
   margin-bottom: 20px;
   text-align: center;
   font-family: "Inter";
+  margin: 10px;
+  margin-top: 30px;
 }
 
+h2 {
+  color: white;
+  font-size: 50px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-family: "Inter";
+  margin: 10px;
+  margin-top: 60px;
+}
 p,
 label {
   color: white;
   text-align: center;
   font-family: "Inter";
+  margin: 10px;
 }
 
 
 #button-form {
   text-align: center;
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   font-size: 15px;
+  margin-top: 70px;
 }
