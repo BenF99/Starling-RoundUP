@@ -1,3 +1,3 @@
 # Starling-Technical-Challenge
 
-![Preview](https://i.gyazo.com/dca484e0ff538be21a24f55718083bad.png)
+![Preview](https://i.gyazo.com/6c8a14769cf4a7f58dd6d25d9d5fa558.mp4)
