@@ -15,7 +15,7 @@ def home(request):
         render: HTML template with values filled
     """
     context = {  # Context to be SENT to template
-        'savings': 0.0  # Set to 0.0 until butten pressed
+        'savings': ""  # Set to 0.0 until butten pressed
     }
     if(request.GET.get('mybtn')):
         yyyy_ww = request.GET.get('week')  # Gets week selected

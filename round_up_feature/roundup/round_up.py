@@ -110,4 +110,4 @@ def main(minTransactionTimestamp, maxTransactionTimestamp):
         minTransactionTimestamp, maxTransactionTimestamp)
     main.addToSavings(savings)
 
-    return savings/100  # Return savings in standard format to be displayed on HTML page
+    return f'£{savings/100:.2f}'  # Return savings in standard format to be displayed on HTML page
