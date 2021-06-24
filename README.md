@@ -17,3 +17,4 @@ Dependencies:
 
 - Python (incl. Django)
 - HTML, CSS
+- JS (https://vincentgarreau.com/particles.js/)
